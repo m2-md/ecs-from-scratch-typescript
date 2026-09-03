@@ -1,5 +1,9 @@
 # ECS from Scratch — Entity Component System in TypeScript
 
+<!-- LINKS:BEGIN — üretildi: scripts/sync-repo-links.py · elle düzenleme -->
+**▶ [Live demo](https://m2-md.github.io/ecs-from-scratch-typescript/)** · [Source](https://github.com/m2-md/ecs-from-scratch-typescript)
+<!-- LINKS:END -->
+
 Working code for the article "Entity Component System from Scratch: Write Your Own
 ECS in TypeScript, Then Move to bitECS". It contains three things:
 
