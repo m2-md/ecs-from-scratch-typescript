@@ -1,0 +1,24 @@
+{
+  "name": "ecs-from-scratch-typescript",
+  "version": "1.0.0",
+  "description": "Sıfırdan veri-odaklı Entity Component System (SoA + bitmask query) ve bitECS'e geçiş, benchmark ve testlerle",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "bench": "vite-node src/bench-cli.ts"
+  },
+  "dependencies": {
+    "bitecs": "^0.3.40"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.1",
+    "typescript": "^5.6.0",
+    "vite": "^6.0.0",
+    "vite-node": "^2.1.0",
+    "vitest": "^2.1.0"
+  }
+}
