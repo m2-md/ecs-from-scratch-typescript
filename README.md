@@ -4,6 +4,8 @@
 **▶ [Live demo](https://m2-md.github.io/ecs-from-scratch-typescript/)** · [Source](https://github.com/m2-md/ecs-from-scratch-typescript)
 <!-- LINKS:END -->
 
+> Data-oriented Entity Component System built from scratch in TypeScript (Structure of Arrays + bitmask queries) with benchmarks and migration to bitECS.
+
 Working code for the article "Entity Component System from Scratch: Write Your Own
 ECS in TypeScript, Then Move to bitECS". It contains three things:
 
@@ -33,6 +35,9 @@ npm run dev
 
 - `http://localhost:5173/` → 5000 particles falling and bouncing off the walls with
   ECS (the assembly line: `gravity → movement → bounds → render`).
+
+> Do not open `index.html` with `file://` — the ES modules will not resolve and you
+> will get a blank screen. The Vite dev server is required.
 
 ## Test
 
@@ -69,6 +74,13 @@ stores (SoA) directly rather than going through `query()` — what is being meas
 is the memory layout (AoS vs SoA). `query()` allocates an `Entity[]` on every call
 and adds a layer of index indirection; that cost is a separate topic and one of the
 reasons to move to bitECS.
+
+## Build
+
+```bash
+npm run build      # tsc && vite build
+npm run preview
+```
 
 ## File layout
 
