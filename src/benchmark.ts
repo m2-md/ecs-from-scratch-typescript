@@ -18,9 +18,9 @@ export function runEcs(count: number, ticks: number): number {
     Position.y[e] = Math.random() * 600;
   }
 
-  // Sıcak döngü: component store'larını (SoA) doğrudan, bitişik gez.
-  // query() bir Entity[] allocate edip index dolaylaması getirir; burada
-  // ölçtüğümüz şey bellek düzeni (AoS vs SoA), o yüzden rafa doğrudan uzanıyoruz.
+  // Hot loop: iterate component stores (SoA) contiguously.
+  // query() allocates an Entity[] and introduces indirection; here
+  // we measure memory layout (AoS vs SoA), accessing stores directly.
   const px = Position.x;
   const py = Position.y;
   const vx = Velocity.x;
@@ -40,7 +40,7 @@ export function runEcs(count: number, ticks: number): number {
 }
 
 export function compare(count: number, ticks: number): void {
-  // JIT ısınsın diye birer tur çevir
+  // Warm up JIT
   runOop(1000, 10);
   runEcs(1000, 10);
 
@@ -48,5 +48,5 @@ export function compare(count: number, ticks: number): void {
   const ecs = runEcs(count, ticks);
   console.log(`OOP (array of structs): ${oop.toFixed(1)} ms`);
   console.log(`ECS (structure of arrays): ${ecs.toFixed(1)} ms`);
-  console.log(`hızlanma: ${(oop / ecs).toFixed(2)}x`);
+  console.log(`speedup: ${(oop / ecs).toFixed(2)}x`);
 }

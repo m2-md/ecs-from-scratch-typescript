@@ -1,4 +1,4 @@
-// render.ts — canvas'a bağlı; asla saf mantıkla karışmaz
+// render.ts — canvas bound; never mixed with pure logic
 import { type World, query, Position } from "./ecs";
 
 export function renderSystem(

@@ -12,7 +12,7 @@ import {
 import { movementSystem } from "../src/systems";
 
 describe("movementSystem", () => {
-  it("konumu hız * dt kadar deterministik ilerletir", () => {
+  it("deterministically advances position by velocity * dt", () => {
     const world = createWorld();
     const e = createEntity(world);
     addComponent(world, Position, e);
@@ -22,7 +22,7 @@ describe("movementSystem", () => {
     Velocity.x[e] = 10;
     Velocity.y[e] = -5;
 
-    // dt = 0.5 ile üç tick: 3 * 0.5 = 1.5 saniye
+    // three ticks with dt = 0.5: 3 * 0.5 = 1.5 seconds
     movementSystem(world, 0.5);
     movementSystem(world, 0.5);
     movementSystem(world, 0.5);
@@ -33,16 +33,16 @@ describe("movementSystem", () => {
   });
 });
 
-// ecs.test.ts (devam)
+// ecs.test.ts (continued)
 describe("query", () => {
-  it("yalnızca istenen component setinin TAMAMINA sahip entity'leri döndürür", () => {
+  it("returns only entities having ALL of the requested component set", () => {
     const world = createWorld();
 
     const full = createEntity(world); // Position + Velocity
     addComponent(world, Position, full);
     addComponent(world, Velocity, full);
 
-    const posOnly = createEntity(world); // sadece Position
+    const posOnly = createEntity(world); // Position only
     addComponent(world, Position, posOnly);
     Position.x[posOnly] = 100;
 
@@ -50,7 +50,7 @@ describe("query", () => {
     expect(moving).toEqual([full]);
     expect(moving).not.toContain(posOnly);
 
-    // movementSystem posOnly'ye dokunmamalı
+    // movementSystem should not touch posOnly
     movementSystem(world, 1);
     expect(Position.x[posOnly]).toBe(100);
     expect(hasComponent(world, Velocity, posOnly)).toBe(false);

@@ -1,8 +1,8 @@
-// ecs.ts — çekirdek
+// ecs.ts — core
 export type Entity = number;
 export const MAX_ENTITIES = 100_000;
 
-// Her Vec2 component'i: bitmask'te bir bit + iki paralel Float32Array
+// Each Vec2 component: one bit in the bitmask + two parallel Float32Arrays
 export interface Vec2Store {
   bit: number;
   x: Float32Array;
@@ -12,7 +12,7 @@ export interface Vec2Store {
 let nextBit = 0;
 export function defineVec2(): Vec2Store {
   return {
-    bit: 1 << nextBit++, // her component bitmask'te tek bir biti sahiplenir
+    bit: 1 << nextBit++, // each component owns exactly one bit in the bitmask
     x: new Float32Array(MAX_ENTITIES),
     y: new Float32Array(MAX_ENTITIES),
   };
@@ -21,12 +21,12 @@ export function defineVec2(): Vec2Store {
 export const Position = defineVec2();
 export const Velocity = defineVec2();
 
-// ecs.ts — dünya (World)
+// ecs.ts — World
 export interface World {
-  masks: Uint32Array; // entity id -> hangi component'lere sahip (bitmask)
-  alive: Uint8Array; // entity id -> canlı mı?
-  count: number; // şu ana kadar açılmış en yüksek id (high-water mark)
-  free: Entity[]; // silinip geri dönüşüme giren id'ler
+  masks: Uint32Array; // entity id -> which components it has (bitmask)
+  alive: Uint8Array; // entity id -> is alive?
+  count: number; // highest allocated id so far (high-water mark)
+  free: Entity[]; // deleted recycled IDs
 }
 
 export function createWorld(): World {
@@ -39,7 +39,7 @@ export function createWorld(): World {
 }
 
 export function createEntity(world: World): Entity {
-  // Boşta id varsa geri dönüştür, yoksa yeni bir tane aç
+  // Recycle free ID if available, otherwise allocate new
   const e = world.free.length > 0 ? world.free.pop()! : world.count++;
   world.alive[e] = 1;
   world.masks[e] = 0;
@@ -49,16 +49,16 @@ export function createEntity(world: World): Entity {
 export function destroyEntity(world: World, e: Entity): void {
   world.alive[e] = 0;
   world.masks[e] = 0;
-  world.free.push(e); // id'yi çöpe atma, havuza geri koy
+  world.free.push(e); // return ID to pool instead of discarding
 }
 
-// ecs.ts — component takma/sökme
+// ecs.ts — attach/detach components
 export function addComponent(
   world: World,
   store: { bit: number },
   e: Entity,
 ): void {
-  world.masks[e] |= store.bit; // biti aç
+  world.masks[e] |= store.bit; // enable bit
 }
 
 export function removeComponent(
@@ -66,7 +66,7 @@ export function removeComponent(
   store: { bit: number },
   e: Entity,
 ): void {
-  world.masks[e] &= ~store.bit; // biti kapat
+  world.masks[e] &= ~store.bit; // clear the bit
 }
 
 export function hasComponent(

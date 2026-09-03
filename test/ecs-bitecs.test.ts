@@ -23,7 +23,7 @@ function movementSystem(world: any, dt: number) {
 }
 
 describe("bitECS movementSystem", () => {
-  it("sadece Position+Velocity olan entity'yi ilerletir", () => {
+  it("advances only the entity that has both Position and Velocity", () => {
     const world = createWorld();
 
     const full = addEntity(world);
@@ -36,12 +36,12 @@ describe("bitECS movementSystem", () => {
     addComponent(world, Position, posOnly);
     Position.x[posOnly] = 100;
 
-    expect(movementQuery(world).length).toBe(1); // sadece 'full'
+    expect(movementQuery(world).length).toBe(1); // only 'full'
 
     for (let i = 0; i < 3; i++) movementSystem(world, 0.5);
 
     expect(Position.x[full]).toBe(15);
     expect(Position.y[full]).toBe(-7.5);
-    expect(Position.x[posOnly]).toBe(100); // el değmedi
+    expect(Position.x[posOnly]).toBe(100); // untouched
   });
 });

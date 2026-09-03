@@ -1,7 +1,7 @@
 {
   "name": "ecs-from-scratch-typescript",
   "version": "1.0.0",
-  "description": "Sıfırdan veri-odaklı Entity Component System (SoA + bitmask query) ve bitECS'e geçiş, benchmark ve testlerle",
+  "description": "Data-oriented Entity Component System built from scratch in TypeScript (Structure of Arrays + bitmask queries) with benchmarks and migration to bitECS.",
   "type": "module",
   "license": "MIT",
   "scripts": {

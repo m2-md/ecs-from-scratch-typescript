@@ -9,11 +9,11 @@ import {
   type IWorld,
 } from "bitecs";
 
-// Bizim defineVec2()'nin bitECS karşılığı
+// Our defineVec2() equivalent in bitECS
 export const Position = defineComponent({ x: Types.f32, y: Types.f32 });
 export const Velocity = defineComponent({ x: Types.f32, y: Types.f32 });
 
-// Bizim query(world, [Position, Velocity])'nin karşılığı — ama önceden derlenir
+// Our query(world, [Position, Velocity]) equivalent — precompiled
 const movementQuery = defineQuery([Position, Velocity]);
 
 export function movementSystem(world: IWorld, dt: number): IWorld {

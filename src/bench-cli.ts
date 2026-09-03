@@ -1,4 +1,4 @@
-// bench-cli.ts — `npm run bench` giriş noktası
+// bench-cli.ts — `npm run bench` entry point
 import { compare } from "./benchmark";
 
 const count = Number(process.argv[2] ?? 50_000);

@@ -1,4 +1,4 @@
-// main.ts — RAF döngüsü, sahne sistemlere bölünmüş
+// main.ts — RAF loop, scene decoupled into systems
 import {
   createWorld,
   createEntity,
@@ -16,7 +16,7 @@ const H = (canvas.height = window.innerHeight);
 
 const world = createWorld();
 
-// 5000 parçacık — hepsi rastgele hızla, banttan geçen boş şasiler
+// 5000 particles — each with random velocity
 for (let i = 0; i < 5000; i++) {
   const e = createEntity(world);
   addComponent(world, Position, e);
@@ -32,11 +32,11 @@ function frame(now: number): void {
   const dt = Math.min((now - last) / 1000, 1 / 30);
   last = now;
 
-  // Bant boyunca istasyonlar — sıra önemlidir
-  gravitySystem(world, dt); // 1. hıza yerçekimi ekle
-  movementSystem(world, dt); // 2. konumu ilerlet
-  boundsSystem(world, W, H); // 3. duvardan sektir
-  renderSystem(world, ctx, W, H); // 4. ekrana çiz
+  // Pipeline stations — execution order matters
+  gravitySystem(world, dt); // 1. apply gravity to velocity
+  movementSystem(world, dt); // 2. advance position
+  boundsSystem(world, W, H); // 3. bounce off the walls
+  renderSystem(world, ctx, W, H); // 4. draw to screen
 
   requestAnimationFrame(frame);
 }

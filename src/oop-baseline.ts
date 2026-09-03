@@ -1,4 +1,4 @@
-// oop-baseline.ts — "usta" modeli: veri + davranış tek nesnede
+// oop-baseline.ts — OOP baseline: data + behavior in a single object
 class Particle {
   constructor(
     public x: number,
@@ -9,7 +9,7 @@ class Particle {
   ) {}
 
   update(dt: number, width: number, height: number): void {
-    this.vy += 900 * dt; // yerçekimi
+    this.vy += 900 * dt; // gravity
     this.x += this.vx * dt;
     this.y += this.vy * dt;
     if (this.x < 0 || this.x > width) this.vx = -this.vx;

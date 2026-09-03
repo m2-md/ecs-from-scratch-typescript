@@ -1,33 +1,34 @@
-# Sıfırdan ECS — TypeScript'te Entity Component System
+# ECS from Scratch — Entity Component System in TypeScript
 
-"Sıfırdan Entity Component System: TypeScript'te Kendi ECS'ini Yaz, Sonra bitECS'e
-Geç" makalesinin çalışan kodu. Üç şey içerir:
+Working code for the article "Entity Component System from Scratch: Write Your Own
+ECS in TypeScript, Then Move to bitECS". It contains three things:
 
-1. **Elle yazılan ECS çekirdeği** (`src/ecs.ts`) — sayısal entity id, bitmask
-   component maskesi, SoA (`Float32Array`) component store'ları ve `query()`.
-2. **Sistemler** (`src/systems.ts`, `src/render.ts`) — saf `(world, dt) => void`
-   fonksiyonları: `movementSystem`, `gravitySystem`, `boundsSystem` + canvas'a
-   bağlı `renderSystem`.
-3. **bitECS sürümü** (`src/ecs-bitecs.ts`) — aynı mantık, `defineComponent` /
-   `defineQuery` ile. Sistem gövdeleri elle yazılan sürümle birebir aynı.
+1. **A hand-written ECS core** (`src/ecs.ts`) — numeric entity ids, a bitmask
+   component mask, SoA (`Float32Array`) component stores and `query()`.
+2. **Systems** (`src/systems.ts`, `src/render.ts`) — pure `(world, dt) => void`
+   functions: `movementSystem`, `gravitySystem`, `boundsSystem` plus the
+   canvas-bound `renderSystem`.
+3. **The bitECS version** (`src/ecs-bitecs.ts`) — the same logic with
+   `defineComponent` / `defineQuery`. The system bodies are identical to the
+   hand-written version.
 
-Ayrıca OOP `Particle[]` (AoS) ile ECS (SoA) hot loop'unu yan yana ölçen bir
-benchmark ve saf mantığı doğrulayan Vitest testleri var.
+There is also a benchmark that measures the OOP `Particle[]` (AoS) hot loop
+side by side with the ECS (SoA) one, and Vitest tests that verify the pure logic.
 
-## Kurulum
+## Setup
 
 ```bash
 npm install
 ```
 
-## Çalıştırma
+## Running
 
 ```bash
 npm run dev
 ```
 
-- `http://localhost:5173/` → 5000 parçacık ECS ile düşüp duvarlardan sekiyor
-  (montaj hattı: `gravity → movement → bounds → render`).
+- `http://localhost:5173/` → 5000 particles falling and bouncing off the walls with
+  ECS (the assembly line: `gravity → movement → bounds → render`).
 
 ## Test
 
@@ -35,57 +36,58 @@ npm run dev
 npm test
 ```
 
-Vitest, render'sız saf mantığı doğrular:
+Vitest verifies the pure logic, without rendering:
 
-- `test/ecs.test.ts` — `movementSystem` determinizmi (3 tick, `pos.x === 15`,
-  `pos.y === -7.5`, f32'de tam) ve `query`'nin yalnızca istenen component setinin
-  tamamına sahip entity'leri döndürmesi (`posOnly` filtrelenir, dokunulmaz).
-- `test/ecs-bitecs.test.ts` — bitECS `movementQuery(world).length === 1` ve aynı
-  deterministik hareket beklentisi.
+- `test/ecs.test.ts` — `movementSystem` determinism (3 ticks, `pos.x === 15`,
+  `pos.y === -7.5`, exact in f32) and that `query` returns only the entities that
+  have the whole requested component set (`posOnly` is filtered out, untouched).
+- `test/ecs-bitecs.test.ts` — bitECS `movementQuery(world).length === 1` and the
+  same deterministic movement expectation.
 
 ## Benchmark
 
 ```bash
-npm run bench            # 50000 entity x 200 tick (varsayılan)
-npm run bench 200000 100 # count ve ticks özelleştir
+npm run bench            # 50000 entities x 200 ticks (default)
+npm run bench 200000 100 # customize count and ticks
 ```
 
-Örnek çıktı (Node 22 / V8, tek makine — sizde oynar):
+Sample output (Node 22 / V8, a single machine — it will vary on yours):
 
 ```
 benchmark: 50000 entity x 200 tick
 OOP (array of structs): 48.2 ms
 ECS (structure of arrays): 22.6 ms
-hızlanma: 2.14x
+speedup: 2.14x
 ```
 
-Not: benchmark ECS tarafında sıcak döngüyü `query()` üzerinden değil, component
-store'larını (SoA) doğrudan gezerek yazar — ölçülen şey bellek düzenidir (AoS vs
-SoA). `query()` her çağrıda bir `Entity[]` allocate edip index dolaylaması getirir;
-o maliyet ayrı bir konudur ve bitECS'e geçme sebeplerinden biridir.
+Note: on the ECS side the benchmark writes the hot loop by walking the component
+stores (SoA) directly rather than going through `query()` — what is being measured
+is the memory layout (AoS vs SoA). `query()` allocates an `Entity[]` on every call
+and adds a layer of index indirection; that cost is a separate topic and one of the
+reasons to move to bitECS.
 
-## Dosya yapısı
+## File layout
 
 ```
 src/
-  oop-baseline.ts  # class Particle + runOop (AoS "usta" modeli)
-  ecs.ts           # çekirdek: Entity, Vec2Store, World, query, bitmask op'ları
+  oop-baseline.ts  # class Particle + runOop (the AoS "textbook" model)
+  ecs.ts           # core: Entity, Vec2Store, World, query, bitmask ops
   systems.ts       # movementSystem, gravitySystem, boundsSystem
-  render.ts        # renderSystem (canvas'a bağlı, testten hariç)
-  ecs-bitecs.ts    # aynı mantığın bitECS sürümü
+  render.ts        # renderSystem (canvas-bound, excluded from tests)
+  ecs-bitecs.ts    # the bitECS version of the same logic
   benchmark.ts     # runEcs (SoA hot loop) + compare
-  bench-cli.ts     # `npm run bench` giriş noktası
-  main.ts          # RAF döngüsü: 5000 parçacık, sistemlere bölünmüş sahne
+  bench-cli.ts     # `npm run bench` entry point
+  main.ts          # RAF loop: 5000 particles, scene split across systems
 test/
   ecs.test.ts
   ecs-bitecs.test.ts
 ```
 
-## Bağımlılıklar
+## Dependencies
 
-- `bitecs@^0.3.40` — makaledeki `defineComponent` / `defineQuery` API'si bu ailededir.
+- `bitecs@^0.3.40` — the `defineComponent` / `defineQuery` API in the article belongs to this family.
 - Dev: `typescript`, `vite`, `vite-node` (bench CLI), `vitest`, `@types/node`.
 
-## Lisans
+## License
 
 MIT

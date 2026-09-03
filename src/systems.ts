@@ -9,7 +9,7 @@ export function movementSystem(world: World, dt: number): void {
   }
 }
 
-// systems.ts (devam)
+// systems.ts (continued)
 export function gravitySystem(world: World, dt: number, g = 900): void {
   const ents = query(world, [Velocity]);
   for (const e of ents) {
@@ -17,7 +17,7 @@ export function gravitySystem(world: World, dt: number, g = 900): void {
   }
 }
 
-// systems.ts (devam)
+// systems.ts (continued)
 export function boundsSystem(
   world: World,
   width: number,
